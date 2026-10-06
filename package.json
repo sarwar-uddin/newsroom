@@ -1,0 +1,17 @@
+{
+  "name": "newsroom",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.28.4",
+  "scripts": {
+    "dev": "pnpm --parallel --filter web --filter api dev",
+    "build": "pnpm --parallel --filter web --filter api build",
+    "typecheck": "pnpm --parallel --filter web --filter api typecheck",
+    "lint": "pnpm --parallel --filter web --filter api lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.9"
+  }
+}
