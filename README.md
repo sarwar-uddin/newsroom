@@ -167,3 +167,12 @@ serverless hosts.
 The MVP is complete and tested locally but not deployed yet. The seed content is fictional
 demonstration material, labelled as such on every page; remove it before launch. Known gaps are
 listed under "Remaining production hardening" in [`docs/SECURITY.md`](docs/SECURITY.md).
+
+## License
+
+Copyright © 2026 Sarwar Uddin
+
+Newsroom is free software: you can redistribute it and/or modify it under the terms of the
+[GNU Affero General Public License](LICENSE) as published by the Free Software Foundation, either
+version 3 of the License, or (at your option) any later version. If you run a modified version on
+a server, the AGPL requires you to offer its source code to the users who interact with it.
