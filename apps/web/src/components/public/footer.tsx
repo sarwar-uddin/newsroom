@@ -55,7 +55,17 @@ export async function Footer() {
         <span>
           © {new Date().getFullYear()} {site.name}. Independent publication.
         </span>
-        <span>No trackers. No analytics.</span>
+        <span>
+          No trackers. No analytics.{' '}
+          <a
+            href={site.sourceUrl}
+            rel="noopener noreferrer"
+            className="underline hover:!text-paper"
+          >
+            Source code
+          </a>{' '}
+          (AGPL-3.0).
+        </span>
       </div>
     </footer>
   );

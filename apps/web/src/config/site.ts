@@ -18,6 +18,11 @@ export const site = {
     youtube: '',
   },
   contactEmail: '',
+  /**
+   * Public source of the code this site runs (AGPL-3.0 §13). If you run a modified version, point
+   * this at your fork.
+   */
+  sourceUrl: process.env.NEXT_PUBLIC_SOURCE_URL ?? 'https://github.com/sarwar-uddin/newsroom',
   /** Visible on every page while the site carries sample content. */
   demoNotice: true,
 } as const;

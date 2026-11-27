@@ -12,14 +12,15 @@ lists what a production deployment needs.
 
 ## Environment
 
-| Variable                | Required           | Notes                                                                                                        |
-| ----------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `DATABASE_URL`          | yes                | Use a least-privilege role; `sslmode=require` for managed databases.                                         |
-| `SITE_URL`              | yes                | Public origin, e.g. `https://example.org`. Used for canonical URLs, feeds, OG tags and upload origin checks. |
-| `UPLOAD_DIR`            | local storage only | Absolute path on a persistent volume.                                                                        |
-| `MEDIA_MAX_BYTES`       | no                 | Default 8 MiB. Keep the proxy's body limit slightly above it.                                                |
-| `NEXT_PUBLIC_SITE_NAME` | no                 | Overrides the placeholder name at build time.                                                                |
-| `NODE_ENV=production`   | yes                | Enables `Secure` / `__Host-` cookies.                                                                        |
+| Variable                 | Required           | Notes                                                                                                        |
+| ------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`           | yes                | Use a least-privilege role; `sslmode=require` for managed databases.                                         |
+| `SITE_URL`               | yes                | Public origin, e.g. `https://example.org`. Used for canonical URLs, feeds, OG tags and upload origin checks. |
+| `UPLOAD_DIR`             | local storage only | Absolute path on a persistent volume.                                                                        |
+| `MEDIA_MAX_BYTES`        | no                 | Default 8 MiB. Keep the proxy's body limit slightly above it.                                                |
+| `NEXT_PUBLIC_SITE_NAME`  | no                 | Overrides the placeholder name at build time.                                                                |
+| `NEXT_PUBLIC_SOURCE_URL` | no                 | Footer "Source code" link. Point it at your fork if you run a modified version (AGPL-3.0 §13).               |
+| `NODE_ENV=production`    | yes                | Enables `Secure` / `__Host-` cookies.                                                                        |
 
 ## Release steps
 
