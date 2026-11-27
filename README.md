@@ -1,168 +1,126 @@
 # Newsroom
 
-A serious, multilingual local news and media platform built as a production-oriented
-portfolio project.
+The publishing platform for an independent, Bangladesh-focused digital publication covering
+investigations, politics and power, society, counterculture, arts and long-form opinion. English
+first, with the content model ready for Bengali.
 
-The initial target is a Bangla-first publication with English support, designed around
-real editorial workflows rather than a generic blog.
+The publication name is a placeholder ("Working Title"). Change it in
+`apps/web/src/config/site.ts`.
 
-## Project goals
+It provides:
 
-- Publish and present journalism
-- Support Bangla and English content
-- Provide a real editorial backend
-- Support authors, categories, tags, media, search, revisions, and corrections
-- Provide strong SEO and accessibility
-- Use PostgreSQL as the authoritative content store
-- Build toward a deployable production system
+- **Public site:** newspaper-style homepage, article pages, section/author/tag archives, full-text
+  search, About/Contact/Privacy, RSS, sitemap, robots.txt, Open Graph/Twitter/Schema.org metadata.
+- **Editorial CMS (`/admin`):** login, dashboard, rich-text editor, draft → review → publish
+  workflow with role-based permissions, preview, image uploads, sections, bylines, tags.
 
 ## Stack
 
-### Web
+Next.js 16 (App Router, React 19, TypeScript strict) · Tailwind CSS 4 · PostgreSQL 18 ·
+Drizzle ORM · Zod · Tiptap · Argon2id (`@node-rs/argon2`) · Vitest · Playwright · pnpm workspace ·
+Docker Compose.
 
-- Next.js
-- React
-- TypeScript
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design and the reasons behind it.
 
-### API
-
-- Node.js
-- Express
-- TypeScript
-- Zod
-
-### Database
-
-- PostgreSQL
-- Drizzle ORM
-
-### Testing
-
-- Vitest
-- Supertest
-- Playwright
-
-### Infrastructure
-
-- Docker Compose
-- Nginx
-- GitHub Actions
-
-## Architecture
+## Repository layout
 
 ```text
-Browser
-   │
-   ▼
-Next.js web application
-   │
-   │ HTTP
-   ▼
-Express API
-   │
-   ▼
-PostgreSQL
+apps/web/
+  src/app/(public)/     reader-facing routes
+  src/app/admin/        CMS routes + server actions
+  src/server/           domain layer: db, auth, content, media
+  src/lib/              shared helpers (rich-text format, slugs, dates, SEO)
+  src/config/site.ts    publication identity
+  drizzle/              SQL migrations
+  scripts/              migrate, seed, create-user
+  tests/                Vitest unit + integration tests
+  e2e/                  Playwright tests
+docs/                   architecture, database, workflow, security, deployment
+docker-compose.yml      PostgreSQL (dev) + optional disposable test database
 ```
 
-Development infrastructure currently provides PostgreSQL through Docker Compose.
+## Prerequisites
 
-## Repository structure
+- Node.js ≥ 22 (developed on 26)
+- pnpm 12 (`corepack enable` or install pnpm directly)
+- Docker with Docker Compose (or any PostgreSQL ≥ 16 you point `DATABASE_URL` at)
 
-```text
-newsroom/
-├── apps/
-│   ├── web/
-│   └── api/
-├── packages/
-├── docs/
-├── docker-compose.yml
-├── .env.example
-├── package.json
-├── pnpm-workspace.yaml
-└── README.md
-```
-
-## Local setup
-
-Requirements:
-
-- Node.js
-
-- pnpm
-
-- Docker
-
-- Docker Compose
-
-Install dependencies:
+## Setup
 
 ```bash
 pnpm install
+cp .env.example .env              # then edit: set real passwords; keep DATABASE_URL in sync with POSTGRES_*
+docker compose up -d postgres     # PostgreSQL on 127.0.0.1:5433
+pnpm db:migrate                   # create the schema
+pnpm db:seed                      # optional: demonstration content (empty database only)
 ```
 
-Copy the environment template:
+The single `.env` at the repository root is read by Docker Compose, the Next.js app and all
+scripts.
+
+### Create the first administrator
 
 ```bash
-cp .env.example .env
+pnpm user:create --email you@example.org --name "Your Name" --role admin
 ```
 
-Start PostgreSQL:
+You will be prompted for a password (min. 12 characters, hidden input). Other roles:
 
 ```bash
-docker compose up -d postgres
+pnpm user:create --email ed@example.org --name "An Editor" --role editor
+pnpm user:create --email w@example.org --name "A Writer" --role author        # creates their byline
+pnpm user:create --email w@example.org --name "A Writer" --role author --byline existing-slug
 ```
 
-Start the web application and API:
+There is no public sign-up. For automation, the password can be piped on stdin.
+
+### Run
 
 ```bash
-pnpm dev
+pnpm dev                          # http://localhost:3000, CMS at http://localhost:3000/admin
 ```
 
-The development services are:
-
-- Web: [http://localhost:3000](http://localhost:3000)
-
-- API: [http://localhost:4000](http://localhost:4000)
-
-- PostgreSQL: localhost:5433
-
-Check the API:
+## Tests
 
 ```bash
-curl http://localhost:4000/api/health
-```
-
-## Quality checks
-
-```bash
-pnpm format:check
 pnpm typecheck
 pnpm lint
-pnpm build
+pnpm test                         # unit tests; integration tests are skipped without TEST_DATABASE_URL
 ```
 
-## Project status
+Integration and end-to-end tests need a **separate, disposable** database: they truncate or drop
+everything in it, and refuse to run if it equals `DATABASE_URL`.
 
-The project is currently in M0 — Product framing + repository bootstrap.
+```bash
+docker compose --profile test up -d postgres-test     # 127.0.0.1:5434, in-memory (tmpfs)
+# TEST_DATABASE_URL in .env points at it (see .env.example)
+pnpm test                         # unit + integration
+pnpm build && pnpm test:e2e       # Playwright against the production build on port 3100
+```
 
-The next milestone is M1 — PostgreSQL schema and content model.
+Playwright needs a Chromium: run `pnpm --filter web exec playwright install chromium` once, or
+set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium` to use a system browser.
 
-See the project specification for the complete roadmap.
+## Production build
+
+```bash
+pnpm build
+pnpm start
+```
+
+Read [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) first. In particular, local-disk media storage
+does not work on serverless hosts.
 
 ## Documentation
 
-- `docs/architecture.md`
-
-- `docs/database.md`
-
-- `docs/api.md`
-
-- `docs/editorial-model.md`
-
-- `docs/deployment.md`
-
-- `docs/git-workflow.md`
+- [Architecture](docs/ARCHITECTURE.md)
+- [Database](docs/DATABASE.md)
+- [Editorial workflow & roles](docs/EDITORIAL_WORKFLOW.md)
+- [Security](docs/SECURITY.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Git workflow](docs/git-workflow.md)
 
 ## Status
 
-Planning and active development.
+MVP verified locally; not yet deployed. Seeded content is fictional demonstration material and is
+labelled as such on every page. Remove it before launch.
